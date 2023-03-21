@@ -1,0 +1,211 @@
+ int request_number = 0;
+ int place_counter = 0;
+int pump=2; // relay module connected to pump
+int ENA = 3;  //ENA connected to digital pin 3
+int ENB = 9;  //ENB connected to digital pin 9
+int MOTOR_A1 = 5; // MOTOR_A1 connected to digital pin 4
+int MOTOR_A2 = 4; // MOTOR_A2 connected to digital pin 5
+int MOTOR_B1 = 7; // MOTOR_B1 connected to digital pin 6
+int MOTOR_B2 = 6; // MOTOR_B2 connected to digital pin 7
+
+int input_1=10;   // to select building and station 
+int input_2=11;   // to select building and station  00 station 01 building#1  10 building#2  11 building#3
+int input_3=12; // input for pump
+
+int RIGHT = A0; // RIGHT sensor connected to analog pin A0
+int LEFT = A1;  // LEFT sensor connected to analog pin A0
+
+#define TRIG A2 // TRIG PIN connected to analog pin A2
+#define ECHO A3 // ECHO PIN connected to analog pin A3
+#define MAX_DISTANCE 100 // Define Maximum Distance
+
+#define sensro_adjust_value   40    // adjust this value when checking the black line.
+
+NewPing sonar(TRIG, ECHO, MAX_DISTANCE);
+
+void setup() {
+  // put your setup code here, to run once:
+
+  pinMode(ENA, OUTPUT); // initialize ENA pin as an output
+  pinMode(ENB, OUTPUT); // initialize ENB pin as an output
+  pinMode(MOTOR_A1, OUTPUT); // initialize MOTOR_A1 pin as an output
+  pinMode(MOTOR_A2, OUTPUT); // initialize MOTOR_A2 pin as an output
+  pinMode(MOTOR_B1, OUTPUT); // initialize MOTOR_B1 pin as an output
+  pinMode(MOTOR_B2, OUTPUT); // initialize MOTOR_B2 pin as an output
+  pinMode(RIGHT, INPUT); // initialize RIGHT pin as an input
+  pinMode(LEFT, INPUT);  // initialize LEFT pin as an input
+  pinMode(input_1,INPUT_PULLUP);
+  pinMode(input_2,INPUT_PULLUP);
+  pinMode(input_3,INPUT_PULLUP);
+  pinMode(pump,OUTPUT);
+  digitalWrite(pump,HIGH); // pump off
+delay(2000);
+  //Serial.begin(9600);
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  if(digitalRead(input_1)==LOW &&digitalRead(input_2)==LOW)request_number=0;
+  if(digitalRead(input_1)==LOW &&digitalRead(input_2)==HIGH)request_number=1;
+  if(digitalRead(input_1)==HIGH &&digitalRead(input_2)==LOW)request_number=2;
+  if(digitalRead(input_1)==HIGH &&digitalRead(input_2)==HIGH)request_number=3;
+  if(digitalRead(input_3)==HIGH)digitalWrite(pump,LOW);  // relay on of pump
+  if(digitalRead(input_3)==LOW)digitalWrite(pump,HIGH); // relay off of pump
+  
+  
+  /*
+    while(1)
+    {
+    //  int distance2 = sonar.ping_cm();
+    //  Serial.println(distance2);
+    //  delay(1000);
+    //moveForward();
+    //turnRight();
+    // turnLeft();
+    Serial.print("Right=");
+    Serial.println(analogRead(RIGHT));
+    Serial.print("Left=");
+    Serial.println(analogRead(LEFT));
+    delay(250);
+
+    }
+
+  */
+
+
+
+
+  delay(1);
+  /*int distance =0;
+    //distance=sonar.ping_cm();
+    if (distance == 0) {
+    distance = 30;
+    }
+    while(distance <=15) {
+    Stop();
+    delay(myspeed);
+    distance=sonar.ping_cm();
+    if (distance == 0) {
+    distance = 30;
+    }
+  */
+  /*
+    turnRight();
+    delay(850);
+    moveForward();
+    delay(1000);
+    turnLeft();
+    delay(850);
+    moveForward();
+    delay(1myspeed);
+    turnLeft();
+    delay(800);
+    moveForward();
+    delay(900);
+    turnRight();
+    delay(900);
+
+
+    }*/
+  if (analogRead(RIGHT) <= sensro_adjust_value && analogRead(LEFT) <= sensro_adjust_value) { //////// edited
+    analogWrite(ENA, myspeed);
+    analogWrite(ENB, myspeed);
+    digitalWrite(MOTOR_A1, LOW);
+    digitalWrite(MOTOR_A2, HIGH);
+    digitalWrite(MOTOR_B1, HIGH);
+    digitalWrite(MOTOR_B2, LOW);
+    delay(1); Stop();
+
+
+  } else if (analogRead(RIGHT) <= sensro_adjust_value && !analogRead(LEFT) <= sensro_adjust_value) { //////// edited
+    analogWrite(ENA, myspeed);
+    analogWrite(ENB, myspeed);
+    digitalWrite(MOTOR_A2, HIGH);
+    digitalWrite(MOTOR_A1, LOW);
+    digitalWrite(MOTOR_B2, HIGH);
+    digitalWrite(MOTOR_B1, LOW);
+    delay(1); Stop();
+
+  } else if (!analogRead(RIGHT) <= sensro_adjust_value && analogRead(LEFT) <= sensro_adjust_value) { //////// edited
+    analogWrite(ENA, myspeed);
+    analogWrite(ENB, myspeed);
+    digitalWrite(MOTOR_A2, LOW);
+    digitalWrite(MOTOR_A1, HIGH);
+    digitalWrite(MOTOR_B2, LOW);
+    digitalWrite(MOTOR_B1, HIGH);
+    delay(1); Stop();
+
+  } else if (!analogRead(RIGHT) <= sensro_adjust_value && !analogRead(LEFT) <= sensro_adjust_value) 
+   {
+
+    if (place_counter == request_number)
+    {
+    Stop();
+    delay(250);
+    }
+    else
+    {
+      // go forward
+        
+        delay(50);
+        while(!(analogRead(RIGHT) <= sensro_adjust_value) && !(analogRead(LEFT) <= sensro_adjust_value)) 
+        {
+        analogWrite(ENA, myspeed);
+        analogWrite(ENB, myspeed);
+        digitalWrite(MOTOR_A1, LOW);
+        digitalWrite(MOTOR_A2, HIGH);
+        digitalWrite(MOTOR_B1, HIGH);
+        digitalWrite(MOTOR_B2, LOW);
+        delay(2);
+        Stop();delay(2);
+        }delay(20);
+         place_counter++;
+         if (place_counter >= 4)place_counter = 0;
+      
+    }
+   
+  }
+
+}
+void Stop() {
+  analogWrite(ENA, 0);
+  analogWrite(ENB, 0);
+  digitalWrite(MOTOR_A1, LOW);
+  digitalWrite(MOTOR_A2, LOW);
+  digitalWrite(MOTOR_B1, LOW);
+  digitalWrite(MOTOR_B2, LOW);
+}
+
+void turnRight() {//////// edited
+  analogWrite(ENA, myspeed);
+  analogWrite(ENB, myspeed);
+  /*
+    digitalWrite(MOTOR_A1, LOW);
+    digitalWrite(MOTOR_A2, HIGH);
+    digitalWrite(MOTOR_B1, LOW);
+    digitalWrite(MOTOR_B2, HIGH);
+  */
+  digitalWrite(MOTOR_A2, LOW);
+  digitalWrite(MOTOR_A1, HIGH);
+  digitalWrite(MOTOR_B2, LOW);
+  digitalWrite(MOTOR_B1, HIGH);
+}
+
+void turnLeft() {   //////// edited
+  analogWrite(ENA, myspeed);
+  analogWrite(ENB, myspeed);
+  digitalWrite(MOTOR_A2, HIGH);
+  digitalWrite(MOTOR_A1, LOW);
+  digitalWrite(MOTOR_B2, HIGH);
+  digitalWrite(MOTOR_B1, LOW);
+}
+
+void moveForward() {
+  analogWrite(ENA, myspeed);
+  analogWrite(ENB, myspeed);
+  digitalWrite(MOTOR_A1, LOW);
+  digitalWrite(MOTOR_A2, HIGH);
+  digitalWrite(MOTOR_B1, HIGH);
+  digitalWrite(MOTOR_B2, LOW);
+}
