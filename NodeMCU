@@ -1,0 +1,149 @@
+/// connect D0 to input_1 (pin 10 of arduino)
+/// connect D1 to input_2 (pin 11 of arduino)
+
+int station_request=0;
+int building_1_request=0;
+int building_2_request=0;
+int building_3_request=0;
+int pump_request=0;
+
+#define input_1 D0
+#define input_2 D1
+#define input_3 D2
+
+/* Fill-in information from Blynk Device Info here */
+#define BLYNK_TEMPLATE_ID "TMPLu7FbH-4d"
+#define BLYNK_TEMPLATE_NAME "Project"
+#define BLYNK_AUTH_TOKEN "ArNYTQXvlp9WFUF0qqqh-OC5IXRXHOVo"
+
+/* Comment this out to disable prints and save space */
+#define BLYNK_PRINT Serial
+
+
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+
+// Your WiFi credentials.
+// Set password to "" for open networks.
+char ssid[] = "mywifi01";
+char pass[] = "87654321";
+
+// This function will be called every time Slider Widget
+// in Blynk app writes values to the Virtual Pin V1
+
+BLYNK_WRITE(V0)
+{
+  station_request = param.asInt(); // assigning incoming value from pin V1 to a variable
+if(station_request==1)
+  {
+  Serial.println("Station request");
+  delay(100);
+  Blynk.virtualWrite(V0,0);
+   pinMode(input_1,OUTPUT);digitalWrite(input_1,LOW);  pinMode(input_2,OUTPUT);digitalWrite(input_2,LOW);//request_number=0;
+  //if(digitalRead(input_1)==LOW &&digitalRead(input_2)==HIGH)request_number=1;
+  //if(digitalRead(input_1)==HIGH &&digitalRead(input_2)==LOW)request_number=2;
+ // if(digitalRead(input_1)==HIGH &&digitalRead(input_2)==HIGH)request_number=3;
+  
+  }
+  // process received value
+}
+BLYNK_WRITE(V1)
+{
+  building_1_request = param.asInt(); // assigning incoming value from pin V1 to a variable
+if(building_1_request==1)
+  {
+  Serial.println("building #1 request");
+  delay(100);
+  Blynk.virtualWrite(V1,0);
+   pinMode(input_1,OUTPUT);digitalWrite(input_1,LOW);  pinMode(input_2,INPUT);//request_number=1;
+  //if(digitalRead(input_1)==LOW &&digitalRead(input_2)==HIGH)request_number=1;
+  //if(digitalRead(input_1)==HIGH &&digitalRead(input_2)==LOW)request_number=2;
+ // if(digitalRead(input_1)==HIGH &&digitalRead(input_2)==HIGH)request_number=3;
+  
+  }
+  // process received value
+}
+BLYNK_WRITE(V2)
+{
+  building_2_request = param.asInt(); // assigning incoming value from pin V1 to a variable
+  if(building_2_request==1)
+  {
+  Serial.println("building #2 request");
+  delay(100);
+  Blynk.virtualWrite(V2,0);
+  pinMode(input_1,INPUT); pinMode(input_2,OUTPUT);digitalWrite(input_2,LOW);//request_number=2;
+ 
+  }
+  // process received value
+}
+BLYNK_WRITE(V3)
+{
+  building_3_request = param.asInt(); // assigning incoming value from pin V1 to a variable
+  if(building_3_request==1)
+  {
+  Serial.println("building #3 request");
+  delay(100);
+  Blynk.virtualWrite(V3,0);
+  //pinMode(input_1,HIGH); digitalWrite(input_2,HIGH);//request_number=3;   
+  pinMode(input_1,INPUT);pinMode(input_2,INPUT);
+  }
+  // process received value
+}
+
+BLYNK_WRITE(V4)
+{
+  pump_request = param.asInt(); // assigning incoming value from pin V1 to a variable
+  if(pump_request==0)
+  {
+  Serial.println("pump_request request");
+  //delay(100);
+  //Blynk.virtualWrite(V4,0);
+  //pinMode(input_1,HIGH); digitalWrite(input_2,HIGH);//request_number=3;   
+  pinMode(input_3,OUTPUT);digitalWrite(input_3,LOW);
+  
+  }
+  else if(pump_request==1)
+  {
+    digitalWrite(input_3,HIGH);pinMode(input_3,INPUT);
+  
+  }
+  // process received value
+}
+
+void setup()
+{
+  // Debug console
+  Serial.begin(115200);
+  
+  pinMode(input_1,OUTPUT);
+   pinMode(input_2,OUTPUT);
+   pinMode(input_3,OUTPUT);
+   
+   digitalWrite(input_1,LOW); digitalWrite(input_2,LOW);//request_number=0;
+  delay(2000);
+  Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+  // You can also specify server:
+  //Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass, "blynk.cloud", 80);
+  //Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass, IPAddress(192,168,1,100), 8080);
+}
+
+void loop()
+{
+  Blynk.run();
+
+  if ( ! Blynk.connected() )
+{
+  while ( ! Blynk.connected() )
+   {
+    // try connect again
+    Serial.println("-Try to connect");
+    delay(100);
+   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+   }
+
+    Serial.println("-connected !!  ");
+    delay(500);
+  }
+
+  
+}
